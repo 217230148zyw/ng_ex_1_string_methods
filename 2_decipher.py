@@ -5,17 +5,58 @@ encoded = """
    [6::GZ_7_VS::ok] | [99::IGNORE_ME::bad] | %%noise%%
 """
 
-###############################################################
-"""
-1. Part of the real message is inside the the '[' and ']' brackets.
-2. Each fragment inside the brackets has a number, jumbled text of the message, and 'ok'. Focus on only those fragments. The '::' are just separating these parts in the fragment 
-3. To find the actual message in every fragment,take every letter in the jumbled message, and shift it backward by the number part in that fragment
-For example, if the number is 3 and the jumbled message is ABC, then the actual message is XYZ.
-Similarly, if the number is 5 and the jumbled message is ABC, then the actual message is VWX.
-4. Ignore any fragment that has 'bad' instead of 'ok'.
-5. Once you have decoded all the fragments, combine them in the order of their numbers to get the final message. First comes the fragment with number 1, then 2, and so on.
-"""
-
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+encoded = encoded.replace("\n", "").strip()
 
+parts = encoded.split(" | ")
+
+decoded1 = ""
+decoded2 = ""
+decoded3 = ""
+decoded4 = ""
+decoded5 = ""
+decoded6 = ""
+
+for part in parts:
+    if "[" in part and "]" in part:
+        left = part.find("[")
+        right = part.find("]")
+        content = part[left + 1:right]
+
+        fragment = content.split("::")
+        number_str = fragment[0]
+        jumbled = fragment[1]
+        status = fragment[2]
+
+        if status == "ok" and number_str.isdigit():
+            shift = int(number_str)
+
+            if shift >= 1 and shift <= 6:
+                decoded = ""
+                for char in jumbled:
+                    if char in alphabet:
+                        pos = alphabet.find(char)
+                        new_pos = pos - shift
+                        if new_pos < 0:
+                            new_pos = new_pos + 26
+                        decoded = decoded + alphabet[new_pos]
+                    else:
+                        decoded = decoded + char
+
+                if shift == 1:
+                    decoded1 = decoded
+                elif shift == 2:
+                    decoded2 = decoded
+                elif shift == 3:
+                    decoded3 = decoded
+                elif shift == 4:
+                    decoded4 = decoded
+                elif shift == 5:
+                    decoded5 = decoded
+                elif shift == 6:
+                    decoded6 = decoded
+
+final_message = decoded1 + " " + decoded2 + " " + decoded3 + " " + decoded4 + " " + decoded5 + " " + decoded6
+
+print(final_message)
